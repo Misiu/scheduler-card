@@ -8,7 +8,12 @@
     "rollup": "rollup -c",
     "lint": "eslint src/**/*.ts --fix",
     "format": "prettier --write '**/*.ts'",
-    "start": "rollup -c --watch"
+    "start": "rollup -c --watch",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:browser": "vitest run --project browser",
+    "test:browser:ui": "vitest run --project browser --browser.headless=false",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
@@ -42,6 +47,11 @@
   "devDependencies": {
     "@parcel/transformer-inline-string": "^2.8.3",
     "@rollup/plugin-dynamic-import-vars": "^2.1.2",
-    "parcel": "^2.8.3"
+    "@vitest/browser": "^4.0.18",
+    "@vitest/browser-playwright": "^4.0.18",
+    "parcel": "^2.8.3",
+    "playwright": "^1.58.2",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
   }
 }
