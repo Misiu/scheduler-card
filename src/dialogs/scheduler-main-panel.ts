@@ -26,13 +26,11 @@ import { capitalizeFirstLetter } from "../lib/capitalize_first_letter";
 import { hassLocalize } from "../localize/hassLocalize";
 import { isDefined } from "../lib/is_defined";
 import { moveTimeslot } from "../data/schedule/move_timeslot";
-import { computeEntityDisplay } from "../data/format/compute_entity_display";
+import { computeTargetDisplay } from "../data/format/compute_target_display";
 import { DEFAULT_TIME_STEP } from "../const";
-import { HassEntity } from "home-assistant-js-websocket";
 
 import "../components/scheduler-timeslot-editor";
 import "../components/scheduler-time-picker";
-import "../components/scheduler-entity-picker";
 import '../dialogs/dialog-select-weekdays';
 import '../dialogs/dialog-select-action';
 import '../components/scheduler-collapsible-section';
@@ -223,14 +221,11 @@ export class SchedulerMainPanel extends LitElement {
 
     let heading = '';
 
-    let entityIds = [action.target?.entity_id || []].flat();
-    if (!entityIds.length && ['notify', 'script'].includes(domain)) entityIds = [action.service];
-
-    if (entityIds.length) {
-      heading += entityIds.map(e => computeEntityDisplay(e, this.hass, this.config.customize)).join(", ");
-      heading += ': ';
-    }
+    const targetDisplay = computeTargetDisplay(action, this.hass, this.config.customize);
+    if (targetDisplay) heading += targetDisplay + ': ';
     heading += formatActionDisplay(action, this.hass, this.config.customize, false, true);
+
+    const targetSpec = domain ? { entity: [{ domain: [domain] }] } : {};
 
     return html`
       <scheduler-collapsible-section
@@ -264,18 +259,15 @@ export class SchedulerMainPanel extends LitElement {
 
           ${config.target ? html`
           <scheduler-settings-row>
-            <span slot="heading">${hassLocalize("ui.components.entity.entity-picker.entity", this.hass)}</span>
-            <scheduler-entity-picker
+            <span slot="heading">${localize("ui.panel.editor.target", this.hass)}</span>
+            <ha-target-picker
               .hass=${this.hass}
-              .config=${this.config}
-              .domain=${domain}
-              .filterFunc=${(stateObj: HassEntity) => config.supported_features ? ((stateObj.attributes.supported_features || 0) & config.supported_features) > 0 : true}
-              @value-changed=${this._selectEntity}
-              .value=${[action.target?.entity_id || []].flat()}
-              ?multiple=${true}
+              .value=${action.target || {}}
+              .target=${targetSpec}
+              @value-changed=${this._targetChanged}
               ?disabled=${hasFixedEntity}
             >
-            </scheduler-entity-picker>
+            </ha-target-picker>
           </scheduler-settings-row>
           `
         : ''}
@@ -346,16 +338,13 @@ export class SchedulerMainPanel extends LitElement {
     }
   }
 
-  _selectEntity(ev: CustomEvent) {
-    const entity = ev.detail.value as string | string[] | undefined;
-    if (!entity) return;
+  _targetChanged(ev: CustomEvent) {
+    const target = ev.detail.value as { entity_id?: string | string[]; device_id?: string | string[]; area_id?: string | string[]; label_id?: string | string[] } | undefined;
 
     this.schedule.entries[this.selectedEntry!].slots.forEach((slot, idx) => {
       if (!slot.actions.length) return;
       let action: Action = {
-        ...slot.actions[0], target: {
-          entity_id: entity
-        }
+        ...slot.actions[0], target: target || {}
       };
       this._updateSlot({ actions: [action] }, idx);
     });
@@ -458,8 +447,7 @@ export class SchedulerMainPanel extends LitElement {
     })
       .then((res: Action | null) => {
         if (!res) return;
-        const slot: Timeslot = { ...this.schedule.entries[this.selectedEntry!].slots[this.selectedSlot!] };
-        const target = this.schedule.entries[this.selectedEntry!].slots.find(e => e.actions.length ? e.actions[0].target?.entity_id : undefined);
+        const target = this.schedule.entries[this.selectedEntry!].slots.find(e => e.actions.length > 0 && e.actions[0].target !== undefined);
         let action = { ...res };
         if (target && action.target) action = { ...action, target: target.actions[0].target };
         this._updateSlot({ actions: [action] });

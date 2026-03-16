@@ -99,16 +99,23 @@ const parseAction = (input: Action): ServiceCall | ServiceCall[] => {
     };
     return output;
   }
-  else if (!Array.isArray(input.target?.entity_id)) {
+
+  const target = input.target;
+  const hasNonEntityTarget = isDefined(target.device_id) || isDefined(target.area_id) || isDefined(target.label_id);
+
+  if (hasNonEntityTarget || !Array.isArray(target.entity_id)) {
     let output: ServiceCall = {
       service: input.service,
       service_data: parseServiceData(input.service_data),
-      entity_id: input.target?.entity_id
+      entity_id: target.entity_id,
+      device_id: target.device_id,
+      area_id: target.area_id,
+      label_id: target.label_id,
     };
     return output;
   }
   else {
-    let output = input?.target.entity_id.map((e): ServiceCall => ({
+    let output = target.entity_id.map((e): ServiceCall => ({
       service: input.service,
       service_data: parseServiceData(input.service_data),
       entity_id: e

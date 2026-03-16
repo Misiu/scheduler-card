@@ -9,7 +9,7 @@ export function matchPattern(pattern: string, value?: string) {
     try {
       if ((pattern.startsWith('/') && pattern.endsWith('/')) || pattern.indexOf('*') !== -1) {
         if (!pattern.startsWith('/')) {
-          pattern = pattern.replace(/\./g, '.').replace(/\*/g, '.*');
+          pattern = pattern.replace(/[\\^${}[\]()|+?]/g, '\\$&').replace(/\./g, '\\.').replace(/\*/g, '.*');
           pattern = `/^${pattern}$/`;
         }
         const regex = new RegExp(pattern.slice(1, -1));

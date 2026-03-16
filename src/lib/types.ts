@@ -116,6 +116,9 @@ export interface HomeAssistant {
   dockedSidebar: boolean;
   moreInfoEntityId: string;
   user: CurrentUser;
+  areas?: Record<string, { area_id: string; name: string; icon?: string | null }>;
+  devices?: Record<string, { id: string; name: string; area_id?: string | null }>;
+  labels?: Record<string, { label_id: string; name: string; icon?: string | null; color?: string | null }>;
   callService: (
     domain: ServiceCallRequest["domain"],
     service: ServiceCallRequest["service"],

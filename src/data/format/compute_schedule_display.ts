@@ -1,4 +1,3 @@
-import { computeDomain, friendlyName } from "../../lib/entity";
 import { HomeAssistant } from "../../lib/types";
 import { CustomConfig, DisplayItem, Schedule } from "../../types";
 import { computeTimeDisplay } from "./compute_time_display";
@@ -6,7 +5,7 @@ import { formatActionDisplay } from "./format_action_display";
 import { localize } from "../../localize/localize";
 import { capitalizeFirstLetter } from "../../lib/capitalize_first_letter";
 import { formatWeekdayDisplay } from "../days";
-import { computeEntityDisplay } from "./compute_entity_display";
+import { computeTargetDisplay } from "./compute_target_display";
 
 
 export const computeScheduleDisplay = (schedule: Schedule, config: (DisplayItem | string)[] | DisplayItem | string, hass: HomeAssistant, customize?: CustomConfig): string[] => {
@@ -28,10 +27,7 @@ export const computeScheduleDisplay = (schedule: Schedule, config: (DisplayItem 
           : '';
       case DisplayItem.Entity:
         const nextAction = schedule.entries[0].slots[schedule.next_entries[0] || 0].actions[0];
-        let entityIds = [nextAction.target?.entity_id || []].flat();
-        if (!entityIds.length && ['script', 'notify'].includes(computeDomain(nextAction.service))) entityIds = [nextAction.service];
-        const entityDisplay = entityIds.map(e => computeEntityDisplay(e, hass, customize)).join(", ");
-        return capitalizeFirstLetter(entityDisplay);
+        return capitalizeFirstLetter(computeTargetDisplay(nextAction, hass, customize));
       case DisplayItem.RelativeTime:
         return '<relative-time></relative-time>';
       case DisplayItem.Tags:
