@@ -63,7 +63,10 @@ export interface Action {
   service: string;
   service_data: Record<string, any>;
   target?: {
-    entity_id?: string[] | string
+    entity_id?: string[] | string;
+    device_id?: string[] | string;
+    area_id?: string[] | string;
+    label_id?: string[] | string;
   }
 }
 
@@ -210,6 +213,9 @@ export interface CustomActionConfig extends Action {
   variables?: Record<string, VariableConfig>;
   target?: {
     entity_id?: string[] | string,
+    device_id?: string[] | string,
+    area_id?: string[] | string,
+    label_id?: string[] | string,
     domain?: string,
   }
 }

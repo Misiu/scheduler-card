@@ -9,7 +9,10 @@ interface Dictionary<TValue> {
 
 export interface ServiceCall {
   service: string;
-  entity_id?: string;
+  entity_id?: string | string[];
+  device_id?: string | string[];
+  area_id?: string | string[];
+  label_id?: string | string[];
   service_data?: Dictionary<any>;
 }
 
@@ -65,7 +68,10 @@ const parseAction = (input: ServiceCall): Action => {
     service: input.service,
     service_data: input.service_data,
     target: {
-      entity_id: input.entity_id ? input.entity_id : undefined
+      entity_id: input.entity_id ? input.entity_id : undefined,
+      device_id: input.device_id ? input.device_id : undefined,
+      area_id: input.area_id ? input.area_id : undefined,
+      label_id: input.label_id ? input.label_id : undefined,
     }
   }
 }

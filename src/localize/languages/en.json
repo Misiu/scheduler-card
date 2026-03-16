@@ -134,12 +134,13 @@
         "stop_time": "End time",
         "action": "Action",
         "add_action": "Add action",
+        "target": "Target",
         "select_timeslot": "Select a timeslot",
         "toggle_single_mode": "To single mode",
         "toggle_scheme_mode": "To scheme mode",
         "validation_errors": {
           "overlapping_time": "Schedule has overlapping timeslots",
-          "missing_target_entity": "One or more actions are missing a target entity",
+          "missing_target_entity": "One or more actions are missing a target (entity, device, area, or label)",
           "missing_service_parameter": "One or more actions are missing a required setting",
           "missing_action": "Schedule has no actions"
         }

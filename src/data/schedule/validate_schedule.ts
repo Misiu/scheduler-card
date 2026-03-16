@@ -34,7 +34,11 @@ const validateTimebar = (slots: Timeslot[], hass: HomeAssistant) => {
 const validateAction = (action: Action, hass: HomeAssistant, customize?: CustomConfig) => {
   const config = actionConfig(action, customize);
   if (config?.target) {
-    if (!action.target?.entity_id) return ValidationError.MissingTargetEntity;
+    const hasTarget = isDefined(action.target?.entity_id) ||
+      isDefined(action.target?.device_id) ||
+      isDefined(action.target?.area_id) ||
+      isDefined(action.target?.label_id);
+    if (!hasTarget) return ValidationError.MissingTargetEntity;
   }
   if (config?.fields) {
     if (!Object.entries(config.fields)

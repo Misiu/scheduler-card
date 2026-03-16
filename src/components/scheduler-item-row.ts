@@ -32,7 +32,8 @@ export class SchedulerItemRow extends LitElement {
         if (['script', 'notify'].includes(computeDomain(nextAction.service))) entityId = nextAction.service;
         if (entityId) icon = computeEntityIcon(entityId, this.config.customize, this.hass);
       }
-      const hasRemovedEntity = !([nextAction.target?.entity_id || []].flat()).every(entity_id => Object.keys(this.hass.states).includes(entity_id));
+      const entityIds = [nextAction.target?.entity_id || []].flat();
+      const hasRemovedEntity = entityIds.length > 0 && !entityIds.every(entity_id => Object.keys(this.hass.states).includes(entity_id));
       if (hasRemovedEntity) icon = 'mdi:help';
 
       return html`
