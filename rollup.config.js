@@ -1,3 +1,7 @@
+import {
+  getBabelInputPlugin,
+  getBabelOutputPlugin,
+} from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import nodeResolve from "@rollup/plugin-node-resolve";
@@ -24,6 +28,20 @@ const plugins = [
   nodeResolve(),
   json(),
   commonjs(),
+  getBabelInputPlugin({
+    babelHelpers: "bundled",
+  }),
+  getBabelOutputPlugin({
+    presets: [
+      [
+        "@babel/preset-env",
+        {
+          modules: false,
+        },
+      ],
+    ],
+    compact: true,
+  }),
   ...(dev ? [serve(serveOptions)] : [terser()]),
 ];
 
@@ -32,7 +50,7 @@ export default [
     input: "src/scheduler-card.ts",
     output: {
       dir: "dist",
-      format: "iife",
+      format: "es",
       inlineDynamicImports: true,
     },
     plugins,
