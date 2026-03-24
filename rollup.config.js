@@ -1,31 +1,41 @@
-import nodeResolve from 'rollup-plugin-node-resolve';
-import typescript from 'rollup-plugin-typescript2';
-import json from 'rollup-plugin-json';
-import { terser } from 'rollup-plugin-terser';
-import commonjs from 'rollup-plugin-commonjs';
-import visualizer from 'rollup-plugin-visualizer';
+import commonjs from "@rollup/plugin-commonjs";
+import json from "@rollup/plugin-json";
+import nodeResolve from "@rollup/plugin-node-resolve";
+import terser from "@rollup/plugin-terser";
+import typescript from "@rollup/plugin-typescript";
+import serve from "rollup-plugin-serve";
 
+const dev = process.env.ROLLUP_WATCH;
+
+const serveOptions = {
+  contentBase: ["./dist"],
+  host: "0.0.0.0",
+  port: 5000,
+  allowCrossOrigin: true,
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+  },
+};
 
 const plugins = [
-  nodeResolve(),
-  commonjs({
-    include: 'node_modules/**',
+  typescript({
+    declaration: false,
   }),
-  typescript(),
+  nodeResolve(),
   json(),
-  visualizer(),
-  terser(),
+  commonjs(),
+  ...(dev ? [serve(serveOptions)] : [terser()]),
 ];
 
 export default [
   {
-    input: 'src/scheduler-card.ts',
+    input: "src/scheduler-card.ts",
     output: {
-      dir: 'dist',
-      format: 'iife',
-      sourcemap: false,
+      dir: "dist",
+      format: "iife",
+      inlineDynamicImports: true,
     },
-    plugins: [...plugins],
-    context: 'window',
+    plugins,
+    context: "window",
   },
 ];
