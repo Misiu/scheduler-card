@@ -7,9 +7,9 @@ body:
       value: |
         Your feature requests should be kept small, else it will probably remain open for a long time or not be implemented at all.
         Note that this place is only for proposing improvements for the card, not the [component](https://github.com/nielsfaber/scheduler-component).
-        
+
         ---
-        
+
         Thank you for taking the effort to fill in all relevant details.
   - type: checkboxes
     id: check_existing

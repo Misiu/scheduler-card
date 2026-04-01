@@ -4,11 +4,14 @@
   "description": "Scheduler card for Lovelace",
   "main": "dist/scheduler-card.js",
   "scripts": {
-    "build": "npm run lint && npm run format && npm run rollup",
+    "build": "rollup -c --bundleConfigAsCjs",
     "rollup": "rollup -c --bundleConfigAsCjs",
     "lint": "eslint src/**/*.ts --fix",
-    "format": "prettier --write '**/*.ts'",
-    "start": "rollup -c --watch --bundleConfigAsCjs"
+    "format": "prettier --write .",
+    "start": "rollup -c --watch --bundleConfigAsCjs",
+    "start:hass-stable": "docker run --rm -p8123:8123 -v ./.hass_dev:/config homeassistant/home-assistant:stable",
+    "start:hass": "docker run --rm -p8123:8123 -v ./.hass_dev:/config homeassistant/home-assistant:beta",
+    "start:hass-dev": "docker run --rm -p8123:8123 -v ./.hass_dev:/config homeassistant/home-assistant:dev"
   },
   "repository": {
     "type": "git",
@@ -36,9 +39,11 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.1.4",
-    "rollup": "^4.29.1",
+    "eslint": "^9.36.0",
+    "prettier": "^3.6.2",
+    "rollup": "^4.59.0",
     "rollup-plugin-serve": "^1.1.1",
     "tslib": "^2.8.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   }
 }

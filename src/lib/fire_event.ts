@@ -1,7 +1,6 @@
-
 declare global {
   // tslint:disable-next-line
-  interface HASSDomEvents { }
+  interface HASSDomEvents {}
 }
 
 export type ValidHassDomEvent = keyof HASSDomEvents;
@@ -26,7 +25,7 @@ export const fireEvent = (
   const event = new Event(type, {
     bubbles: options.bubbles === undefined ? true : options.bubbles,
     cancelable: Boolean(options.cancelable),
-    composed: options.composed === undefined ? true : options.composed
+    composed: options.composed === undefined ? true : options.composed,
   });
   (event as any).detail = detail;
   node.dispatchEvent(event);
