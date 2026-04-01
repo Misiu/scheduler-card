@@ -2,18 +2,18 @@
 
 Thank you for your interest in contributing to this project!
 You can contribute to this project by submitting a PR with your changes.
-Note that it may take between 1-4 weeks before your work can be reviewed and approved.
+Note that it may take between 1-4 weeks before your work can be reviewed and approved. 
 
 ## Building
 
-- Install Node.js (latest LTS release).
-  - On Linux, macOS, or Windows WSL, consider using [nvm.sh](https://github.com/nvm-sh/nvm/blob/master/README.md)
-  - On Windows native, see [Nodejs.org](https://nodejs.org/)
-- `git clone https://github.com/nielsfaber/scheduler-card.git`
-- `cd scheduler-card`
-- `npm install --no-package-lock`
-- `npm start` # To develop interactively
-- `npm run build` # Run lint, prettier, rollup (update 'dist/scheduler-card.js')
+* Install Node.js (latest LTS release).
+  * On Linux, macOS, or Windows WSL, consider using [nvm.sh](https://github.com/nvm-sh/nvm/blob/master/README.md)
+  * On Windows native, see [Nodejs.org](https://nodejs.org/)
+* `git clone https://github.com/nielsfaber/scheduler-card.git`
+* `cd scheduler-card`
+* `npm install --no-package-lock`
+* `npm start`  # To develop interactively
+* `npm run build`  # Run lint, prettier, rollup (update 'dist/scheduler-card.js')
 
 ## Submitting new translations
 

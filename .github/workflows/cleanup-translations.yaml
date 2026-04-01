@@ -7,7 +7,7 @@ name: Cleanup Translations
 on:
   # Run weekly on Monday at 00:00 UTC
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: "0 0 * * 1"
 
   # Allow manual trigger
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Run translation cleanup
         id: cleanup
@@ -51,8 +51,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore: sync translation files with en.json (remove obsolete keys, reorder)'
-          title: 'chore: sync translation files with en.json (remove obsolete keys, reorder)'
+          commit-message: "chore: sync translation files with en.json (remove obsolete keys, reorder)"
+          title: "chore: sync translation files with en.json (remove obsolete keys, reorder)"
           body: ${{ steps.cleanup.outputs.summary }}
           branch: automated/cleanup-translations
           delete-branch: true

@@ -1,20 +1,24 @@
-import { isDefined } from '../../lib/is_defined';
-import { HomeAssistant } from '../../lib/types';
-import { Time, TimeMode, Timeslot } from '../../types';
-import { addTimeOffset } from '../time/add_time_offset';
-import { computeTimestamp } from '../time/compute_timestamp';
-import { parseTimeString } from '../time/parse_time_string';
-import { timeToString } from '../time/time_to_string';
+import { isDefined } from "../../lib/is_defined";
+import { HomeAssistant } from "../../lib/types";
+import { Time, TimeMode, Timeslot } from "../../types";
+import { addTimeOffset } from "../time/add_time_offset";
+import { computeTimestamp } from "../time/compute_timestamp";
+import { parseTimeString } from "../time/parse_time_string";
+import { timeToString } from "../time/time_to_string";
 
 const computeDuration = (timeA: Time | string, timeB: Time | string, hass: HomeAssistant) => {
-  let tsA = typeof timeA == 'string' ? computeTimestamp(parseTimeString(timeA), hass) : computeTimestamp(timeA, hass);
+  let tsA = typeof timeA == 'string'
+    ? computeTimestamp(parseTimeString(timeA), hass)
+    : computeTimestamp(timeA, hass);
 
-  let tsB = typeof timeB == 'string' ? computeTimestamp(parseTimeString(timeB), hass) : computeTimestamp(timeB, hass);
+  let tsB = typeof timeB == 'string'
+    ? computeTimestamp(parseTimeString(timeB), hass)
+    : computeTimestamp(timeB, hass);
 
   if (tsB > tsA) return 1;
   else if (tsB < tsA) return -1;
   else return 0;
-};
+}
 
 const startTime = (s: Timeslot) => parseTimeString(s.start);
 const stopTime = (s: Timeslot) => {
@@ -22,17 +26,13 @@ const stopTime = (s: Timeslot) => {
     const time = parseTimeString(s.stop!);
     if (time.hours == 0 && time.minutes == 0 && time.mode == TimeMode.Fixed) return { ...time, hours: 24 };
     return time;
-  } else {
+  }
+  else {
     return addTimeOffset(startTime(s), { minutes: 1 });
   }
 };
 
-export const moveTimeslot = (
-  slots: Timeslot[],
-  slotIdx: number,
-  update: { start?: Time; stop?: Time },
-  hass: HomeAssistant
-): [Timeslot[], number] => {
+export const moveTimeslot = (slots: Timeslot[], slotIdx: number, update: { start?: Time, stop?: Time }, hass: HomeAssistant): [Timeslot[], number] => {
   let slotIdxOut = slotIdx;
 
   if (isDefined(update.stop)) {
@@ -46,10 +46,11 @@ export const moveTimeslot = (
   let newTime = update.start;
 
   let lowerLimit = startTime(slots[slotIdx]);
-  for (let i = slotIdx - 1; i >= 0; i--) {
-    //walk through all slots prior to modified one
+  for (let i = slotIdx - 1; i >= 0; i--) { //walk through all slots prior to modified one
     if (slots[i].actions.length) {
-      lowerLimit = i == slotIdx - 1 ? addTimeOffset(startTime(slots[i]), { minutes: 1 }) : stopTime(slots[i]);
+      lowerLimit = i == (slotIdx - 1)
+        ? addTimeOffset(startTime(slots[i]), { minutes: 1 })
+        : stopTime(slots[i]);
       break;
     }
     lowerLimit = startTime(slots[i]);
@@ -57,10 +58,11 @@ export const moveTimeslot = (
 
   let upperLimit = addTimeOffset(stopTime(slots[slotIdx]), { minutes: -1 });
   if (!isDefined(slots[slotIdx].stop)) {
-    for (let i = slotIdx + 1; i < slots.length; i++) {
-      //walk through all slots after the modified one
+    for (let i = slotIdx + 1; i < slots.length; i++) { //walk through all slots after the modified one
       if (slots[i].actions.length) {
-        upperLimit = i == slotIdx + 1 ? addTimeOffset(stopTime(slots[i]), { minutes: -1 }) : startTime(slots[i]);
+        upperLimit = i == (slotIdx + 1)
+          ? addTimeOffset(stopTime(slots[i]), { minutes: -1 })
+          : startTime(slots[i]);
         break;
       }
       upperLimit = stopTime(slots[i]);
@@ -77,10 +79,8 @@ export const moveTimeslot = (
 
   slots = Object.assign(slots, { [slotIdx]: <Timeslot>{ ...slots[slotIdx], start: timeToString(newTime) } });
 
-  if (computeDuration(oldTime, newTime, hass) <= 0) {
-    //time is moved backwards or kept the same
-    for (let i = slotIdx - 1; i >= 0; i--) {
-      //walk through all slots prior to modified one
+  if (computeDuration(oldTime, newTime, hass) <= 0) { //time is moved backwards or kept the same
+    for (let i = slotIdx - 1; i >= 0; i--) { //walk through all slots prior to modified one
       let d1 = computeDuration(startTime(slots[i]), newTime, hass);
       let d2 = computeDuration(stopTime(slots[i]), newTime, hass);
 
@@ -88,10 +88,12 @@ export const moveTimeslot = (
         //timeslot has partial overlap with the new time point, it should be shortened.
         slots = Object.assign(slots, { [i]: <Timeslot>{ ...slots[i], stop: timeToString(newTime) } });
         break;
-      } else if (d2 >= 0) {
+      }
+      else if (d2 >= 0) {
         //timeslot slot ends before the new time point, stop iterating
         break;
-      } else if (d1 <= 0) {
+      }
+      else if (d1 <= 0) {
         //new time point causes timeslot to be fully overlapped, erase it
         slots = Object.assign(slots, { [i]: null });
         slotIdxOut = slotIdxOut - 1;
@@ -102,27 +104,19 @@ export const moveTimeslot = (
     //slot has no stop time, so moving the start point to the left requires the next slot to be made longer
     if (isDefined(slots[slotIdx + 1].stop) && !slots[slotIdx + 1].actions.length) {
       //stretch next slot
-      slots = Object.assign(slots, {
-        [slotIdx + 1]: <Timeslot>{ ...slots[slotIdx + 1], start: timeToString(stopTime(slots[slotIdx])) },
-      });
-    } else {
+      slots = Object.assign(slots, { [slotIdx + 1]: <Timeslot>{ ...slots[slotIdx + 1], start: timeToString(stopTime(slots[slotIdx])) } });
+    }
+    else {
       //insert new filler behind
       slots = [
         ...slots.slice(0, slotIdx + 1),
-        <Timeslot>{
-          ...slots[slotIdx],
-          start: timeToString(stopTime(slots[slotIdx])),
-          stop: timeToString(startTime(slots[slotIdx + 1])),
-          actions: [],
-        },
+        <Timeslot>{ ...slots[slotIdx], start: timeToString(stopTime(slots[slotIdx])), stop: timeToString(startTime(slots[slotIdx + 1])), actions: [] },
         ...slots.slice(slotIdx + 1),
       ];
     }
   }
-  if (computeDuration(oldTime, newTime, hass) >= 0) {
-    //time is moved forward or kept the same
-    for (let i = slotIdxOut + 1; i < slots.length; i++) {
-      //walk through all slots after the modified one
+  if (computeDuration(oldTime, newTime, hass) >= 0) { //time is moved forward or kept the same
+    for (let i = (slotIdxOut + 1); i < slots.length; i++) { //walk through all slots after the modified one
       let newStopTime = stopTime(slots[slotIdxOut]);
       let d1 = computeDuration(startTime(slots[i]), newStopTime, hass);
       let d2 = computeDuration(stopTime(slots[i]), newStopTime, hass);
@@ -130,21 +124,23 @@ export const moveTimeslot = (
       if (d1 >= 0 && d2 < 0) {
         //timeslot has partial overlap with the new time point, it should be shortened.
         slots = Object.assign(slots, { [i]: <Timeslot>{ ...slots[i], start: timeToString(newStopTime) } });
-      } else if (d1 < 0) {
+      }
+      else if (d1 < 0) {
         //timeslot slot ends before the new time point, stop iterating
         break;
-      } else if (d2 >= 0) {
+      }
+      else if (d2 >= 0) {
         //new time point causes timeslot to be fully overlapped, erase it
         slots = Object.assign(slots, { [i]: null });
       }
     }
   }
-  if (computeDuration(oldTime, newTime, hass) > 0) {
-    //time is moved forward
+  if (computeDuration(oldTime, newTime, hass) > 0) { //time is moved forward
     if (slotIdx > 0 && isDefined(slots[slotIdx - 1].stop)) {
       //stretch previous slot
       slots = Object.assign(slots, { [slotIdx - 1]: <Timeslot>{ ...slots[slotIdx - 1], stop: timeToString(newTime) } });
-    } else {
+    }
+    else {
       //insert new filler before
       slots = [
         ...slots.slice(0, slotIdx),
@@ -152,7 +148,7 @@ export const moveTimeslot = (
           ...slots[slotIdx],
           start: slotIdx > 0 ? timeToString(stopTime(slots[slotIdx - 1])) : '00:00:00',
           stop: timeToString(newTime),
-          actions: [],
+          actions: []
         },
         ...slots.slice(slotIdx),
       ];
@@ -162,4 +158,4 @@ export const moveTimeslot = (
 
   slots = slots.filter(isDefined); //remove null slots if created during loop
   return [slots, slotIdxOut];
-};
+}

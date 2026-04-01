@@ -1,5 +1,7 @@
-import { Time, TimeMode } from '../../types';
-import { roundTime } from './round_time';
+import { Time, TimeMode } from "../../types";
+import { roundTime } from "./round_time";
+
+
 
 export const parseTimeString = (string: string): Time => {
   if (string.match(/^([0-9:]+)$/)) {
@@ -35,6 +37,6 @@ export const parseTimeString = (string: string): Time => {
   return {
     mode: TimeMode.Fixed,
     hours: time.hours,
-    minutes: time.minutes,
-  };
-};
+    minutes: time.minutes
+  }
+}
