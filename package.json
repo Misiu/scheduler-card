@@ -4,14 +4,11 @@
   "description": "Scheduler card for Lovelace",
   "main": "dist/scheduler-card.js",
   "scripts": {
-    "build": "rollup -c --bundleConfigAsCjs",
-    "rollup": "rollup -c --bundleConfigAsCjs",
+    "build": "npm run lint && npm run format && npm run rollup",
+    "rollup": "rollup -c",
     "lint": "eslint src/**/*.ts --fix",
-    "format": "prettier --write .",
-    "start": "rollup -c --watch --bundleConfigAsCjs",
-    "start:hass-stable": "docker run --rm -p8123:8123 -v ./.hass_dev:/config homeassistant/home-assistant:stable",
-    "start:hass": "docker run --rm -p8123:8123 -v ./.hass_dev:/config homeassistant/home-assistant:beta",
-    "start:hass-dev": "docker run --rm -p8123:8123 -v ./.hass_dev:/config homeassistant/home-assistant:dev"
+    "format": "prettier --write '**/*.ts'",
+    "start": "rollup -c --watch"
   },
   "repository": {
     "type": "git",
